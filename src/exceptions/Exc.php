@@ -2,7 +2,7 @@
 
 namespace retval\Exc;
 
-
+require_once __DIR__ . "/../Trace.php";
 
 use JsonSerializable;
 use retval\Trace;
