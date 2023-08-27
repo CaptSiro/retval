@@ -30,7 +30,7 @@ class ResultSet implements JsonSerializable {
 
 
     public function isSuccess(): bool {
-        return isset($this->succ);
+        return isset($this->success);
     }
 
 
@@ -51,7 +51,10 @@ class ResultSet implements JsonSerializable {
 
 
 
-    public function jsonSerialize() {
-        // TODO: Implement jsonSerialize() method.
+    public function jsonSerialize(): object {
+        return (object)[
+            "success" => $this->success,
+            "failures" => $this->failures
+        ];
     }
 }
