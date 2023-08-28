@@ -1,7 +1,7 @@
 <?php
 
-use retval\Result;
+namespace retval;
 
 function success($value): Result {
-    return new Result($value, null);
+    return new Result(true, $value, null);
 }

@@ -12,11 +12,12 @@ require_once __DIR__ . "/exceptions/Exc.php";
 
 
 class Result implements JsonSerializable {
-    protected $success, $failure;
+    protected $success, $failure, $isSuccess;
 
 
 
-    public function __construct($success, ?Exc $failure) {
+    public function __construct($isSuccess, $success, ?Exc $failure) {
+        $this->isSuccess = $isSuccess;
         $this->success = $success;
         $this->failure = $failure;
     }
@@ -44,7 +45,7 @@ class Result implements JsonSerializable {
 
 
 
-    public function getFailure() {
+    public function getFailure(): Exc {
         return $this->failure;
     }
 
@@ -57,7 +58,7 @@ class Result implements JsonSerializable {
 
 
     public function succeeded(Closure $function): Result {
-        if ($this->isSuccess()) {
+        if ($this->isSuccess) {
             return success($function($this->success));
         }
 
@@ -67,7 +68,7 @@ class Result implements JsonSerializable {
 
 
     public function isSuccess(): bool {
-        return isset($this->success);
+        return $this->isSuccess;
     }
 
 
@@ -83,13 +84,13 @@ class Result implements JsonSerializable {
 
 
     public function isFailure(): bool {
-        return isset($this->failure);
+        return !$this->isSuccess;
     }
 
 
 
     public function either(Closure $successFunction, Closure $failFunction): Result {
-        if ($this->isSuccess()) {
+        if ($this->isSuccess) {
             return success($successFunction($this->success));
         }
 
@@ -99,8 +100,8 @@ class Result implements JsonSerializable {
 
 
     public function strip(Closure $failFunction) {
-        if ($this->isFailure()) {
-            return $failFunction();
+        if (!$this->isSuccess) {
+            return $failFunction($this->failure);
         }
 
         return $this->success;
@@ -110,7 +111,7 @@ class Result implements JsonSerializable {
 
     public function jsonSerialize(): object {
         return (object)[
-            "isSuccess" => $this->isSuccess(),
+            "isSuccess" => $this->isSuccess,
             "success" => $this->success,
             "failure" => $this->failure,
         ];
